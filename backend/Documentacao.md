@@ -168,4 +168,4 @@ Sempre é bom rodar `dotnet build` para verificar quaisquer erros com a API.
 
 O `dotnet ef migrations add NomedaMigration` serve para transformar o código de C# para PostgreSQL. Cada classe referenciada no AppDbContext.cs e criada no Models será instanciada usando as regras do PostgreSQL. OBS: Toda migration deve ter um nome único.
 
-Se tudo ocorrer corretamente, ao olhar o banco de dados veremos três tabelas. Duas relacionadas e uma sem relacionamento que serve para os dados de cada migration.
+Se tudo ocorrer corretamente, ao olhar o banco de dados veremos três tabelas. Duas relacionadas e uma sem relacionamento que serve para guardar os dados de cada migration.
