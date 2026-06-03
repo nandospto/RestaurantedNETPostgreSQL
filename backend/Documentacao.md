@@ -43,7 +43,7 @@ app.Run();
 
 ~~~
 
-Criaremos agora uma pasta de Database, Controllers e Models onde ficarão a ligação com o framework do postgresql, os controles e o modelos das tabelas. Adicionando também a linha `builder.Services.AddControllers();` no Program.cs abaixo do `builder.Services.AddOpenApi();`
+Criaremos agora uma pasta de Database, Controllers e Models onde ficarão a ligação com o framework do postgresql, os controles e o modelos das tabelas. Adicionando também a linha `builder.Services.AddControllers();` no Program.cs abaixo do `builder.Services.AddOpenApi();`. Adicionamos também `app.MapControllers();` antes do `app.run();` para mapear os controllers do backend.Controllers.
 
 As pastas servem para melhorar a organização do código.
 
@@ -87,7 +87,7 @@ No appsettings.json, temos que adicionar a seguinte linha após o `"AllowedHosts
 
 ~~~json
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=MyAppDb;UserId=userid;Password=password;"
+    "AppDBConnectionString": "Server=localhost;Database=MyAppDb;UserId=userid;Password=password;"
   }
 ~~~
 

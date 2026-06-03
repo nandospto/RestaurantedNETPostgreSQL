@@ -1,7 +1,6 @@
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
 
-// Pequeno
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
@@ -18,4 +17,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 app.Run();
