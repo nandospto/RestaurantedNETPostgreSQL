@@ -1,7 +1,7 @@
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
 
-
+// Pequeno
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
