@@ -1,10 +1,10 @@
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Models
 {
     public class Clientes
     {
-        // [Key]
+        [Key]
         public int ClienteId {get; set;}
         public string Nome {get; set;} = null!;
         public string? Email {get; set;}
