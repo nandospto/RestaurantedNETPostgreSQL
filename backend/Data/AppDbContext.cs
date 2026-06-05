@@ -7,7 +7,11 @@ namespace backend.Data
     {
         public AppDbContext(DbContextOptions options) : base(options){}
 
-        public DbSet<Clientes> Clientes {get; set;}
-        public DbSet<Pedidos> Pedidos {get; set;}
+        public DbSet<Cliente> Cliente {get; set;}
+        public DbSet<Pedido> Pedido {get; set;}
+        public DbSet<Mesa> Mesa {get; set;}
+        public DbSet<ItensMenu> ItensMenu {get; set;}
+        public DbSet<PedidosItensMenu> PedidosItensMenu {get; set;}
+        
     }
 }

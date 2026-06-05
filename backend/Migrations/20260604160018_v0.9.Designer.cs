@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260604160018_v0.9")]
+    partial class v09
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,11 +27,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Cliente", b =>
                 {
-                    b.Property<int>("ClienteID")
+                    b.Property<int>("ClienteId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClienteID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClienteId"));
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -40,18 +43,18 @@ namespace backend.Migrations
                     b.Property<string>("Telefone")
                         .HasColumnType("text");
 
-                    b.HasKey("ClienteID");
+                    b.HasKey("ClienteId");
 
                     b.ToTable("Cliente");
                 });
 
             modelBuilder.Entity("backend.Models.ItensMenu", b =>
                 {
-                    b.Property<int>("ItensMenuID")
+                    b.Property<int>("ItemMenuId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ItensMenuID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ItemMenuId"));
 
                     b.Property<string>("Descricao")
                         .HasColumnType("text");
@@ -63,18 +66,18 @@ namespace backend.Migrations
                     b.Property<int>("Preco")
                         .HasColumnType("integer");
 
-                    b.HasKey("ItensMenuID");
+                    b.HasKey("ItemMenuId");
 
                     b.ToTable("ItensMenu");
                 });
 
             modelBuilder.Entity("backend.Models.Mesa", b =>
                 {
-                    b.Property<int>("MesaID")
+                    b.Property<int>("MesaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MesaID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MesaId"));
 
                     b.Property<int>("Capacidade")
                         .HasColumnType("integer");
@@ -82,49 +85,49 @@ namespace backend.Migrations
                     b.Property<bool>("Disponibilidade")
                         .HasColumnType("boolean");
 
-                    b.HasKey("MesaID");
+                    b.HasKey("MesaId");
 
                     b.ToTable("Mesa");
                 });
 
             modelBuilder.Entity("backend.Models.Pedido", b =>
                 {
-                    b.Property<int>("PedidoID")
+                    b.Property<int>("PedidoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PedidoID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PedidoId"));
 
-                    b.Property<int>("ClienteID")
+                    b.Property<int>("ClienteId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Datapedido")
+                    b.Property<DateTime?>("Datapedido")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Descricao")
                         .HasColumnType("text");
 
-                    b.Property<int>("MesaID")
+                    b.Property<int>("MesaId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("Status")
                         .HasColumnType("boolean");
 
-                    b.HasKey("PedidoID");
+                    b.HasKey("PedidoId");
 
-                    b.HasIndex("ClienteID");
+                    b.HasIndex("ClienteId");
 
-                    b.HasIndex("MesaID");
+                    b.HasIndex("MesaId");
 
                     b.ToTable("Pedido");
                 });
 
             modelBuilder.Entity("backend.Models.PedidosItensMenu", b =>
                 {
-                    b.Property<int>("PedidoID")
+                    b.Property<int>("PedidoId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ItensMenuID")
+                    b.Property<int>("ItensMenuId")
                         .HasColumnType("integer");
 
                     b.Property<int>("PrecoUnit")
@@ -133,9 +136,9 @@ namespace backend.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("integer");
 
-                    b.HasKey("PedidoID", "ItensMenuID");
+                    b.HasKey("PedidoId", "ItensMenuId");
 
-                    b.HasIndex("ItensMenuID");
+                    b.HasIndex("ItensMenuId");
 
                     b.ToTable("PedidosItensMenu");
                 });
@@ -144,13 +147,13 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Cliente", "Cliente")
                         .WithMany("Pedido")
-                        .HasForeignKey("ClienteID")
+                        .HasForeignKey("ClienteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("backend.Models.Mesa", "Mesa")
                         .WithMany("Pedido")
-                        .HasForeignKey("MesaID")
+                        .HasForeignKey("MesaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -163,13 +166,13 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.ItensMenu", "ItensMenu")
                         .WithMany("PedidosItensMenus")
-                        .HasForeignKey("ItensMenuID")
+                        .HasForeignKey("ItensMenuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("backend.Models.Pedido", "Pedido")
                         .WithMany("PedidosItensMenus")
-                        .HasForeignKey("PedidoID")
+                        .HasForeignKey("PedidoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

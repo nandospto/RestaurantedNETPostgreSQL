@@ -109,8 +109,8 @@ Com esse passo já podemos criar as tabelas do banco de dados ou exportá-las ca
 Iniciamos adicionando as tabelas no AppDbContext.cs:
 
 ~~~csharp
-public DbSet<Clientes> Clientes {get; set;}
-public DbSet<Pedidos> Pedidos {get; set;}
+public DbSet<Cliente> Cliente {get; set;}
+public DbSet<Pedido> Pedido {get; set;}
 ~~~
 
 Logo após criamos as entidades das tabelas na pasta Models. Isso server apenas para deixar o código mais organizado.
@@ -119,43 +119,37 @@ Temos aqui dois arquivos: Cliente.cs e Pedidos.cs.
 
 Cliente:
 ~~~csharp
-using System.ComponentModel.DataAnnotations; // Para que a chave [Key] funcione
-
 namespace backend.Models
 {
-    public class Clientes
+    public class Cliente
     {
-        [Key] // Chave primária, mas pode ser ignorada se exister uma variável chamada Id
-        public int ClienteId {get; set;}
+        public int ClienteID {get; set;}
         public string Nome {get; set;} = null!;
         public string? Email {get; set;}
         public string? Telefone {get; set;}
 
-        public List<Pedidos> Pedidos {get; set;} = new List<Pedidos>(); // Lista de pedidos associados ao cliente, instanciando uma relação de 1:N
+        public List<Pedido> Pedido {get; set;} = new List<Pedido>(); // Lista de pedidos associados ao cliente, instanciando uma relação de 1:N
     }
 }
 ~~~
 
 Pedidos:
 ~~~csharp
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; // Para que a chave de [ForeignKey] (chave estrangeira)
-
 namespace backend.Models
 {
-    public class Pedidos
+    public class Pedido
     {
-        [Key]
-        public int PedidoId {get; set;}
+        public int PedidoID {get; set;}
         public string? Descricao {get; set;}
 
-        [ForeignKey(nameof(ClienteId))] // Chave estrangeira referenciando a variável ClienteId da classe Clientes
-        public int ClienteId {get; set;}  // Inicialização da variável ClienteId para a chave estrangeira
-        public Clientes Clientes {get; set;} = null!; // Instância da classe Clientes da relação N:1
+        public int ClienteID {get; set;}  // Inicialização da variável ClienteId para a chave estrangeira
+        public Cliente Cliente {get; set;} = null!; // Instância da classe Clientes da relação N:1
     
     }
 }
 ~~~
+
+A convenção é que o a chave a primária será ou `ID` ou `NomedaClasseID`. Caso seja aalgo diferente, é necessário adicionar `using System.ComponentModel.DataAnnotations;` no início do arquivo e a chave [Key] acima da variável primária.
 
 Se tudo estiver correto, podemos inicializar a criação do banco usando:
 
@@ -169,3 +163,37 @@ Sempre é bom rodar `dotnet build` para verificar quaisquer erros com a API.
 O `dotnet ef migrations add NomedaMigration` serve para transformar o código de C# para PostgreSQL. Cada classe referenciada no AppDbContext.cs e criada no Models será instanciada usando as regras do PostgreSQL. OBS: Toda migration deve ter um nome único.
 
 Se tudo ocorrer corretamente, ao olhar o banco de dados veremos três tabelas. Duas relacionadas e uma sem relacionamento que serve para guardar os dados de cada migration.
+
+Para tabelas com mais de uma primary key, podemos usar o EFC com a chave `[PrimaryKey(nameof(PedidoId), nameof(ItemId))]` (o exemplo é para a tabela de itens do meno que estão no pedido).
+
+Com todas as tabelas inseridas, vamos agora partir para o REST.
+
+CRUD e CONTROLLERS
+===
+
+Todos os comandos de CRUD serão inseridos em controllers na pasta Controllers da API. Cada tabela terá um controller especifico.
+
+
+
+
+---
+
+Adição do CORS na parte de serviços (antes do `builder.build`) para a comunicação com o frontend:
+
+~~~csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy.WithOrigins("http://localhost:5173") // URL do seu React
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
+~~~
+
+E de:
+
+~~~csharp
+app.UseCors("AllowReactApp");
+~~~
+
+Depois do `builder.build`.
