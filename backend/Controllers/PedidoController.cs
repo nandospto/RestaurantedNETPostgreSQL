@@ -88,8 +88,8 @@ namespace backend.Controllers
                     PedidoID = p.PedidoID,
                     Descricao = p.Descricao,
                     Datapedido = p.Datapedido,
+                    ClienteNome = p.Cliente.Nome,
                     Status = p.Status,
-                    ClienteID = p.ClienteID,
                     MesaID = p.MesaID
                 })
                 .ToListAsync();
@@ -190,7 +190,7 @@ namespace backend.Controllers
 
             await _appDbContext.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Cliente Patcheado.");
         }
 
         [HttpDelete("{id}")]

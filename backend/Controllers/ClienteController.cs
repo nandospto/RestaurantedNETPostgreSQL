@@ -88,7 +88,7 @@ namespace backend.Controllers
             {
                 return NotFound("Cliente não encontrado.");
             }
-            if (cliente.Nome != null) { _cliente.Nome = cliente.Nome; }
+            if (cliente.Nome != null && cliente.Nome != _cliente.Nome) { _cliente.Nome = cliente.Nome; }
             if (cliente.Telefone != null) { _cliente.Telefone = cliente.Telefone; }
             if (cliente.Email != null) { _cliente.Email = cliente.Email; }
 
