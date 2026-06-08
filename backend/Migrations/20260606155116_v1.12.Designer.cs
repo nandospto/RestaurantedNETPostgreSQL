@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606155116_v1.12")]
+    partial class v112
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,6 +175,9 @@ namespace backend.Migrations
                     b.Property<int>("ClientesID")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("ClientesID1")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("DataPedido")
                         .HasColumnType("timestamp with time zone");
 
@@ -192,6 +198,8 @@ namespace backend.Migrations
                     b.HasKey("PedidosID");
 
                     b.HasIndex("ClientesID");
+
+                    b.HasIndex("ClientesID1");
 
                     b.HasIndex("MesaID");
 
@@ -240,9 +248,14 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Pedidos", b =>
                 {
                     b.HasOne("backend.Models.Clientes", "Clientes")
-                        .WithMany("Pedidos")
+                        .WithMany()
                         .HasForeignKey("ClientesID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Clientes", null)
+                        .WithMany("Pedidos")
+                        .HasForeignKey("ClientesID1");
 
                     b.HasOne("backend.Models.Mesa", "Mesa")
                         .WithMany("Pedidos")
@@ -291,8 +304,7 @@ namespace backend.Migrations
                 {
                     b.Navigation("Endereco");
 
-                    b.Navigation("Pagamentos")
-                        .IsRequired();
+                    b.Navigation("Pagamentos");
 
                     b.Navigation("PedidosItensMenus");
                 });

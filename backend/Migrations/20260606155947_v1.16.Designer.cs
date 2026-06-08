@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606155947_v1.16")]
+    partial class v116
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,7 +178,13 @@ namespace backend.Migrations
                     b.Property<DateTime>("DataPedido")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("EnderencoID")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("MesaID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PagamentosID")
                         .HasColumnType("integer");
 
                     b.Property<string>("StatusPedido")
@@ -242,7 +251,8 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.Clientes", "Clientes")
                         .WithMany("Pedidos")
                         .HasForeignKey("ClientesID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend.Models.Mesa", "Mesa")
                         .WithMany("Pedidos")
@@ -291,8 +301,7 @@ namespace backend.Migrations
                 {
                     b.Navigation("Endereco");
 
-                    b.Navigation("Pagamentos")
-                        .IsRequired();
+                    b.Navigation("Pagamentos");
 
                     b.Navigation("PedidosItensMenus");
                 });

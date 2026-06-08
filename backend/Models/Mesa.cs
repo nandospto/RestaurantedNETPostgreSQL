@@ -6,7 +6,7 @@ namespace backend.Models
         public int Capacidade {get; set;}
         public bool Disponibilidade {get; set;} = true;
 
-        public List<Pedido> Pedido {get; set;} = [];
+        public List<Pedidos> Pedidos {get; set;} = [];
         
     }
 }

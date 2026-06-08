@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606154302_v1.9")]
+    partial class v19
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,7 +172,10 @@ namespace backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PedidosID"));
 
-                    b.Property<int>("ClientesID")
+                    b.Property<int?>("ClientesID")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ClientesID1")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("DataPedido")
@@ -192,6 +198,8 @@ namespace backend.Migrations
                     b.HasKey("PedidosID");
 
                     b.HasIndex("ClientesID");
+
+                    b.HasIndex("ClientesID1");
 
                     b.HasIndex("MesaID");
 
@@ -221,31 +229,35 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Endereco", b =>
                 {
-                    b.HasOne("backend.Models.Pedidos", "Pedidos")
+                    b.HasOne("backend.Models.Pedidos", "Pedido")
                         .WithOne("Endereco")
                         .HasForeignKey("backend.Models.Endereco", "PedidosID");
 
-                    b.Navigation("Pedidos");
+                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("backend.Models.Pagamentos", b =>
                 {
-                    b.HasOne("backend.Models.Pedidos", "Pedidos")
+                    b.HasOne("backend.Models.Pedidos", "Pedido")
                         .WithOne("Pagamentos")
                         .HasForeignKey("backend.Models.Pagamentos", "PedidosID");
 
-                    b.Navigation("Pedidos");
+                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("backend.Models.Pedidos", b =>
                 {
                     b.HasOne("backend.Models.Clientes", "Clientes")
-                        .WithMany("Pedidos")
+                        .WithMany()
                         .HasForeignKey("ClientesID")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("backend.Models.Clientes", null)
+                        .WithMany("Pedido")
+                        .HasForeignKey("ClientesID1");
+
                     b.HasOne("backend.Models.Mesa", "Mesa")
-                        .WithMany("Pedidos")
+                        .WithMany("Pedido")
                         .HasForeignKey("MesaID");
 
                     b.Navigation("Clientes");
@@ -274,7 +286,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Clientes", b =>
                 {
-                    b.Navigation("Pedidos");
+                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("backend.Models.ItensMenu", b =>
@@ -284,15 +296,14 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Mesa", b =>
                 {
-                    b.Navigation("Pedidos");
+                    b.Navigation("Pedido");
                 });
 
             modelBuilder.Entity("backend.Models.Pedidos", b =>
                 {
                     b.Navigation("Endereco");
 
-                    b.Navigation("Pagamentos")
-                        .IsRequired();
+                    b.Navigation("Pagamentos");
 
                     b.Navigation("PedidosItensMenus");
                 });

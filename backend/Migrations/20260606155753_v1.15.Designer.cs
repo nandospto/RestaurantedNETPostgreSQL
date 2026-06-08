@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606155753_v1.15")]
+    partial class v115
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,13 +153,7 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PedidosID")
-                        .HasColumnType("integer");
-
                     b.HasKey("PagamentosID");
-
-                    b.HasIndex("PedidosID")
-                        .IsUnique();
 
                     b.ToTable("Pagamentos");
                 });
@@ -175,7 +172,13 @@ namespace backend.Migrations
                     b.Property<DateTime>("DataPedido")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("EnderencoID")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("MesaID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PagamentosID")
                         .HasColumnType("integer");
 
                     b.Property<string>("StatusPedido")
@@ -194,6 +197,9 @@ namespace backend.Migrations
                     b.HasIndex("ClientesID");
 
                     b.HasIndex("MesaID");
+
+                    b.HasIndex("PagamentosID")
+                        .IsUnique();
 
                     b.ToTable("Pedidos");
                 });
@@ -223,16 +229,9 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Pedidos", "Pedidos")
                         .WithOne("Endereco")
-                        .HasForeignKey("backend.Models.Endereco", "PedidosID");
-
-                    b.Navigation("Pedidos");
-                });
-
-            modelBuilder.Entity("backend.Models.Pagamentos", b =>
-                {
-                    b.HasOne("backend.Models.Pedidos", "Pedidos")
-                        .WithOne("Pagamentos")
-                        .HasForeignKey("backend.Models.Pagamentos", "PedidosID");
+                        .HasForeignKey("backend.Models.Endereco", "PedidosID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Pedidos");
                 });
@@ -242,15 +241,24 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.Clientes", "Clientes")
                         .WithMany("Pedidos")
                         .HasForeignKey("ClientesID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend.Models.Mesa", "Mesa")
                         .WithMany("Pedidos")
                         .HasForeignKey("MesaID");
 
+                    b.HasOne("backend.Models.Pagamentos", "Pagamentos")
+                        .WithOne("Pedidos")
+                        .HasForeignKey("backend.Models.Pedidos", "PagamentosID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Clientes");
 
                     b.Navigation("Mesa");
+
+                    b.Navigation("Pagamentos");
                 });
 
             modelBuilder.Entity("backend.Models.PedidosItensMenu", b =>
@@ -287,12 +295,15 @@ namespace backend.Migrations
                     b.Navigation("Pedidos");
                 });
 
+            modelBuilder.Entity("backend.Models.Pagamentos", b =>
+                {
+                    b.Navigation("Pedidos")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Models.Pedidos", b =>
                 {
                     b.Navigation("Endereco");
-
-                    b.Navigation("Pagamentos")
-                        .IsRequired();
 
                     b.Navigation("PedidosItensMenus");
                 });

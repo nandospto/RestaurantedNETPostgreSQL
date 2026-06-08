@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606155602_v1.14")]
+    partial class v114
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +153,7 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PedidosID")
+                    b.Property<int?>("PedidosID")
                         .HasColumnType("integer");
 
                     b.HasKey("PagamentosID");
@@ -223,7 +226,9 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Pedidos", "Pedidos")
                         .WithOne("Endereco")
-                        .HasForeignKey("backend.Models.Endereco", "PedidosID");
+                        .HasForeignKey("backend.Models.Endereco", "PedidosID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Pedidos");
                 });
@@ -242,7 +247,8 @@ namespace backend.Migrations
                     b.HasOne("backend.Models.Clientes", "Clientes")
                         .WithMany("Pedidos")
                         .HasForeignKey("ClientesID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend.Models.Mesa", "Mesa")
                         .WithMany("Pedidos")
@@ -291,8 +297,7 @@ namespace backend.Migrations
                 {
                     b.Navigation("Endereco");
 
-                    b.Navigation("Pagamentos")
-                        .IsRequired();
+                    b.Navigation("Pagamentos");
 
                     b.Navigation("PedidosItensMenus");
                 });

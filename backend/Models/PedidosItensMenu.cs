@@ -9,12 +9,9 @@ namespace backend.Models
         public int PrecoUnit { get; set; }
 
         public int PedidoID { get; set; }
-        public Pedido Pedido { get; set; } = null!;
+        public Pedidos Pedido { get; set; } = null!;
 
         public int ItensMenuID { get; set; }
         public ItensMenu ItensMenu { get; set; } = null!;
-    
-
-
     }
 }
