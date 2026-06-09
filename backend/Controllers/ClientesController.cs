@@ -1,12 +1,63 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using backend.Dtos.Clientes;
+using backend.Models;
+using backend.Data;
 
 namespace backend.Controllers
 {
-    public class ClientesController
+    [ApiController]
+    [Route("clientes")]
+    public class ClientesController : ControllerBase
     {
-        
+        private readonly AppDbContext _appDbContext;
+
+        public ClientesController(AppDbContext appDbContext)
+        {
+            _appDbContext = appDbContext;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Clientes>>> GetAllClientes()
+        {
+            try
+            {
+                var cliente = _appDbContext.Clientes
+                .Select(c => new ClienteListaDTO
+                {
+                    ClientesID = c.ClientesID,
+                    Nome = c.Nome != null ? c.Nome : "Anônimo"
+                });
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest("Erro ao buscar clientes.");
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Clientes>> AddCliente([FromBody] ClienteCriadoDTO cliente)
+        {
+            try
+            {
+                var _cliente = new Clientes
+                {
+                    Nome = cliente.Nome != null ? cliente.Nome : "Anônimo",
+                    Telefone = cliente.Telefone,
+                    Email = cliente.Email
+                };
+                _appDbContext.Clientes.Add(_cliente);
+                await _appDbContext.SaveChangesAsync();                
+
+                return Ok(_cliente);
+
+            }
+            catch
+            {
+                return BadRequest("Erro ao adicionar cliente.");
+            }
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 using backend.Dtos;
 
-namespace backend.Dtos
+namespace backend.Dtos.Pedidos
 {
     public class ItemPedidoDTO
     {

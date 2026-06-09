@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using backend.Data;
-using backend.Dtos;
+using backend.Dtos.Pedidos;
 using backend.Models;
 
 namespace backend.Controllers
@@ -16,17 +16,17 @@ namespace backend.Controllers
         {
             _appDbContext = appDbContext;
         }
-        //////////////////////////////////
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PedidoMinificadoDTO>>> GetAllPedidos()
+        public async Task<ActionResult<IEnumerable<PedidoResumidoDTO>>> GetAllPedidos()
         {
             try
             {
                 var pedidos = await _appDbContext.Pedidos
-                    .Select(p => new PedidoMinificadoDTO
+                    .Select(p => new PedidoResumidoDTO
                     {
                         PedidosID = p.PedidosID,
-                        ClienteNome = p.Clientes.Nome != null ? p.Clientes.Nome : "Anônimo",
+                        ClienteNome = p.Clientes.Nome,
                         DataPedido = p.DataPedido,
                         StatusPedido = p.StatusPedido,
                         TipoPedido = p.TipoPedido,
@@ -41,15 +41,17 @@ namespace backend.Controllers
                 return BadRequest("Erro ao buscar pedidos.");
             }
         }
-        //////////////////////////////////
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Pedidos>> GetPedido(int id)
         {
             try
             {
                 var pedido = await _appDbContext.Pedidos
-                    .Where(p => p.PedidosID == id)
-                    .Select(p => new PedidoDetalhadoDTO
+                .Include(p => p.PedidosItensMenus)
+                .ThenInclude(pi => pi.ItensMenu)
+                .Where(p => p.PedidosID == id)
+                .Select(p => new PedidoDetalhadoDTO
                     {
                         PedidosID = p.PedidosID,
                         DataPedido = p.DataPedido,
@@ -58,7 +60,7 @@ namespace backend.Controllers
                         ValorTotal = p.ValorTotal,
 
                         ClienteNome = p.Clientes.Nome != null ? p.Clientes.Nome : "Anônimo",
-                        ClienteTelefone = p.Clientes.Telefone,
+                        ClienteTelefone = p.Clientes.Telefone != null ? p.Clientes.Telefone : "Telefone não informado",
                         Endereco = p.TipoPedido == "Delivery" && p.Endereco != null ? p.Endereco.EnderecoCompleto : "Endereço não informado",
                         MesaID = p.Mesa != null ? p.Mesa.MesaID : null,
                         PedidosItensMenus = p.PedidosItensMenus.Select(pi => new ItemPedidoDTO
@@ -69,6 +71,7 @@ namespace backend.Controllers
                         }).ToList()
                     })
                     .FirstOrDefaultAsync();
+                if (pedido == null) return NotFound();
 
                 return Ok(pedido);
             }
@@ -77,8 +80,9 @@ namespace backend.Controllers
                 return NotFound("Erro ao buscar pedidos.");
             }
         }
+
         [HttpPost]
-        public async Task<ActionResult<Pedidos>> AddPedido([FromBody] CriarPedidoDTO pedido)
+        public async Task<ActionResult<Pedidos>> AddPedido([FromBody] PedidoCriadoDTO pedido)
         {
             // Verifica se há itens no pedido
             if (pedido.PedidosItensMenu == null) return BadRequest("O pedido deve conter pelo menos um item.");
@@ -140,6 +144,43 @@ namespace backend.Controllers
             _appDbContext.Pedidos.Add(_pedido);
             await _appDbContext.SaveChangesAsync();
             return Ok(_pedido);
+        }
+        [HttpPatch]
+        [Route("{id}/status")]
+        public async Task<ActionResult> AtualizarStatus(int id, [FromQuery] string status)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(status))
+                {
+                    return BadRequest("Status não informado.");
+                }
+
+                var _pedido = await _appDbContext.Pedidos.FindAsync(id);
+                if (_pedido == null)
+                {
+                    return NotFound("Pedido não encontrado.");
+                }
+                _pedido.StatusPedido = status;
+                await _appDbContext.SaveChangesAsync();
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPatch]
+        [Route("{id}/cancelar")]
+        public async Task<ActionResult> CancelarPedido(int id)
+        {
+            var _pedido = await _appDbContext.Pedidos.FindAsync(id);
+            if (_pedido == null) return NotFound();
+            _pedido.StatusPedido = "Cancelado";
+
+            await _appDbContext.SaveChangesAsync();
+            return Ok();
         }
     }
 }

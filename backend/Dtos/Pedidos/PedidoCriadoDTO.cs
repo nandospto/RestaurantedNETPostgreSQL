@@ -1,8 +1,6 @@
-using backend.Models;
-
-namespace backend.Dtos
+namespace backend.Dtos.Pedidos
 {
-    public class CriarPedidoDTO
+    public class PedidoCriadoDTO
     {
         public int? ClientesID { get; set; }
         public string? ClienteNome { get; set; }
