@@ -22,13 +22,15 @@ namespace backend.Controllers
         {
             try
             {
-                var cliente = _appDbContext.Clientes
+                var clientes = await _appDbContext.Clientes
                 .Select(c => new ClienteListaDTO
                 {
                     ClientesID = c.ClientesID,
                     Nome = c.Nome != null ? c.Nome : "Anônimo"
-                }).ToListAsync();
-                return Ok(cliente);
+                })
+                .ToListAsync();
+
+                return Ok(clientes);
             }
             catch
             {
