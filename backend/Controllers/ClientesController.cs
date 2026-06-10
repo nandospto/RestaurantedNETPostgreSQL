@@ -18,7 +18,7 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Clientes>>> GetAllClientes()
+        public async Task<ActionResult<IEnumerable<ClienteListaDTO>>> GetAllClientes()
         {
             try
             {
@@ -27,8 +27,8 @@ namespace backend.Controllers
                 {
                     ClientesID = c.ClientesID,
                     Nome = c.Nome != null ? c.Nome : "Anônimo"
-                });
-                return Ok();
+                }).ToListAsync();
+                return Ok(cliente);
             }
             catch
             {
@@ -37,7 +37,7 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Clientes>> AddCliente([FromBody] ClienteCriadoDTO cliente)
+        public async Task<ActionResult<ClienteCriadoDTO>> AddCliente([FromBody] Clientes cliente)
         {
             try
             {
