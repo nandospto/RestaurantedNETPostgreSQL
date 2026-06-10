@@ -182,5 +182,26 @@ namespace backend.Controllers
             await _appDbContext.SaveChangesAsync();
             return Ok();
         }
+    
+        /// Pagamentos
+        [HttpPost("{id}/pagamentos")]
+        public async Task<ActionResult<PagamentoDTO>> AddPagamento(int id, [FromBody] PagamentoDTO pagamento)
+        {
+            var _pedido = await _appDbContext.Pedidos.FindAsync(id);
+            if (_pedido == null) return NotFound();
+            if (string.IsNullOrWhiteSpace(pagamento.PagamentoMetodo)) return BadRequest ("Método de pagamento não informado.");
+
+            var _pagamento = new Pagamentos
+            {
+              PagamentoMetodo = pagamento.PagamentoMetodo,
+              PagamentoData = DateTime.Now,
+              PedidosID = _pedido.PedidosID,
+              Pedidos = _pedido
+            };
+
+            _appDbContext.Pagamentos.Add(_pagamento);
+            await _appDbContext.SaveChangesAsync();
+            return Ok(_pagamento);
+        }
     }
 }
